@@ -16,6 +16,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+app.get('/',(req,res)=>{
+  res.send("Hello Word");
+})
+
 //login start
 app.use('/users', require('./users/users.controller'));
 // login end
