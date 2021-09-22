@@ -51,7 +51,6 @@ function deleteimage(filename) {
 }
 
 router.post('/insertdata', upload, (req, res) => {
-
     console.log(typeof (req.body.tag));
     const now = new Date();
     let sql = 'INSERT INTO `files` (`title`, `description`, `file_name`,`tag`, `account`,`createdAt`,`updatedAt`) VALUES (?, ?, ?, ?,?, ?, ?)';

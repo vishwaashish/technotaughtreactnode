@@ -8,83 +8,80 @@ const mysql = require('mysql2');
 const bcrypt = require('bcrypt');
 const cors = require('cors');
 const db = require('../_helpers/db');
-
+var fs = require('fs');
 router.use(cors({
     'allowedHeaders': ['sessionId', 'Content-Type'],
     'exposedHeaders': ['sessionId'],
     'origin': '*',
     'methods': 'GET,HEAD,PUT,PATCH,POST,DELETE',
     'preflightContinue': false
-  }));
+}));
 
 router.use((req, res, next) => {
-    res.header({"Access-Control-Allow-Origin": "*"});
+    res.header({ "Access-Control-Allow-Origin": "*" });
     next();
 })
 
 const { host, user, password, database } = config.database;
-const conn =  mysql.createConnection({ host, user, password, database });
+const conn = mysql.createConnection({ host, user, password, database });
 
-conn.connect((err)=>{
+conn.connect((err) => {
     if (err) {
         throw err;
     }
     console.log('Mysql Connected');
 })
 
-router.post('/register',(req,res)=>{
+router.post('/register', (req, res) => {
+    // data = new Array();
+    // data.push(req.body)
+    
+    // console.log(data,"obj1")
+    // fs.writeFile('./user.json', JSON.stringify(data), 'utf8', (err) => {
+    //     if (err) console.log('Error writing file:', err);
+    // })
+    // fs.readFile('./user.json', 'utf8', (err, result) => {
+    //     if (err) {
+    //         console.log(err);
+    //     } else {
+    //         data = JSON.parse(result);
+    //         data.push(req.body);
+    //         json = JSON.stringify(data,null,2);
+    //         fs.writeFile('user.json',json,'utf8',(err) => {
+    //             if (err) console.log('Error writing file:', err);
+    //         })
+    //         // console.log(obj.data,"obj")
+    //     }
+    //     })
+
+
     sql = 'Select count(*) as ema from users where email = ?';
     console.log(req.body)
-    
-    conn.query(sql,[req.body.email], async (err,result)=>{
-        if(result[0].ema > 0){
+
+    conn.query(sql, [req.body.email], async (err, result) => {
+        if (result[0].ema > 0) {
             // res.write("Email is already there")
-            res.end(JSON.stringify({message: "Email is already there",status:403}))
-        }else{
+            res.end(JSON.stringify({ message: "Email is already there", status: 403 }))
+        } else {
             const now = new Date();
             hashpassword = await bcrypt.hash(req.body.password,10);
             sql = 'INSERT INTO users (name,email,password,createdAt,updatedAt) VALUES (?,?,?,?,?)';
             conn.query(sql,[req.body.name,req.body.email,hashpassword,now,now],(err,result)=>{
-                // res.write({message: "Inserted successfully", data:res });
                 res.end(JSON.stringify({message: "Inserted successfully",status:200, data:result }));
             })
+            res.end()
         }
     })
 })
 
-router.post('/updateusername',(req , res)=>{
+router.post('/updateusername', (req, res) => {
     sql = 'Update users set name = ? where email = ? ';
     console.log(req.body)
-    conn.query(sql,[req.body.name,req.body.email],(err,result)=>{
-        if(err) throw err
-        res.end(JSON.stringify({message: "Updated successfully",status:200, data:result }));
+    conn.query(sql, [req.body.name, req.body.email], (err, result) => {
+        if (err) throw err
+        res.end(JSON.stringify({ message: "Updated successfully", status: 200, data: result }));
     })
 })
-
-// router.post('/updatepassword',async (req , res)=>{
-    // sql = 'Select * from users where email = ? ';
-    // console.log(req.body)
-    // hashpassword = await bcrypt.hash(req.body.password,10);
-    // conn.query(sql,[req.body.email],(err,result)=>{
-    //     console.log(hashpassword,"hashpassword")
-    //     console.log(result[0].password,"password")
-    //     console.log(hashpassword,"hashpassword")
-    //     if(hashpassword === result[0].password){
-    //         console.log(hashpassword,"hash")
-    //         res.end(JSON.stringify({message: "Smae successfully",status:200, data:result }));
-    //     }else{
-            
-    //         res.end(JSON.stringify({message: "NOT successfully",status:200, data:result }));
-    //     }
-    // })
-    // email = req.body.password;
-    // const user = await db.User.scope('withHash').findOne({ where: { email } });
-    // console.log(user)
-    // if (!user || !(await bcrypt.compare(req.bod.password, user.password))){
-    //     // throw 'Username or password is incorrect';
-    //     return { msg:'Username or password is incorrect', status:401 };
-    // }
-// })
 
 router.post('/updatepassword', authenticatepassword);
 function authenticatepassword(req, res, next) {
