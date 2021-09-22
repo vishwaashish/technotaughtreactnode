@@ -63,7 +63,7 @@ app.use(function(req, res, next) {
   //   res.render('error');
   // });
 
-app.listen(process.env.APP_PORT, () => {
+app.listen(3306, () => {
     console.log("Server up and running", process.env.APP_PORT);
 })
 
