@@ -6,7 +6,6 @@ const mysql = require('mysql2');
 const cors = require('cors');
 const config = require('../config.json');
 const fs = require('fs')
-const { promisify } = require('util')
 
 router.use(cors({
     'allowedHeaders': ['sessionId', 'Content-Type'],
